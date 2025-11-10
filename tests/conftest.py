@@ -32,7 +32,7 @@ def neo4j_connection(neo4j_container):
     connection = Neo4jConnection(
         uri=neo4j_container.get_connection_url(),
         username="neo4j",
-        password=neo4j_container.NEO4J_ADMIN_PASSWORD,
+        password=neo4j_container.password,
         database="neo4j"
     )
     
