@@ -1,0 +1,31 @@
+name: "Copilot Setup Steps"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install mcp-neo4j-cypher with pip
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install mcp-neo4j-cypher
+
+      - name: Verify mcp-neo4j-cypher installation
+        run: |
+          which mcp-neo4j-cypher
+          mcp-neo4j-cypher --help || echo "mcp-neo4j-cypher installed"

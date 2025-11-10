@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "neo4j-local": {
+      "type": "local",
+      "command": "mcp-neo4j-cypher",
+      "args": [
+        "--transport",
+        "stdio",
+        "--namespace",
+        "neo4j-local"
+      ],
+      "tools": ["*"],
+      "env": {
+        "NEO4J_URI": "COPILOT_MCP_NEO4J_URI",
+        "NEO4J_USERNAME": "COPILOT_MCP_NEO4J_USERNAME",
+        "NEO4J_PASSWORD": "COPILOT_MCP_NEO4J_PASSWORD",
+        "NEO4J_DATABASE": "COPILOT_MCP_NEO4J_DATABASE"
+      }
+    }
+  }
+}
