@@ -23,8 +23,8 @@ def neo4j_connection_params(neo4j_container):
     """Provide connection parameters for Neo4j testcontainer."""
     return {
         "uri": neo4j_container.get_connection_url(),
-        "username": "neo4j",
-        "password": neo4j_container.NEO4J_ADMIN_PASSWORD,
+        "username": neo4j_container.username,
+        "password": neo4j_container.password,
         "database": "neo4j"
     }
 
