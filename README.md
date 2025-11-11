@@ -100,36 +100,48 @@ mcp-servers:
 Your agent's detailed instructions go here...
 ```
 
-## Environment Variables Configuration
+## Setup Overview
 
-Getting environment variables to work correctly with MCP servers requires careful configuration. After extensive testing, this format works reliably:
+Setting up custom agents with MCP servers involves two distinct parts:
 
-### 1. Create Environment Variables at Organization Level
+### Part 1: Organization-Level Agent Configuration
 
-Create these environment variables in your GitHub organization settings:
+This is where you define your custom agents and their MCP server integrations. This must be done in your organization's `.github-private` repository.
 
-- `COPILOT_MCP_NEO4J_URI`
-- `COPILOT_MCP_NEO4J_USERNAME`
-- `COPILOT_MCP_NEO4J_PASSWORD`
-- `COPILOT_MCP_NEO4J_DATABASE`
+**What goes here:**
+- Agent definition files (`.md` files in `copilot/agents/`)
+- MCP server configuration (command, args, env mappings)
+- Tool permissions for the agent
+
+**Example:** See the agent files in [`org-setup-files/agents/`](org-setup-files/agents/) for complete examples.
+
+### Part 2: Repository-Level Configuration
+
+This is where you configure each individual repository to work with your custom agents.
+
+**What's required:**
+
+#### For All Agents:
+- Create environment variables in repository settings:
+  1. Go to Settings → Environments
+  2. Create an environment named `copilot`
+  3. Add your Neo4j connection variables:
+     - `COPILOT_MCP_NEO4J_URI`
+     - `COPILOT_MCP_NEO4J_USERNAME`
+     - `COPILOT_MCP_NEO4J_PASSWORD`
+     - `COPILOT_MCP_NEO4J_DATABASE`
 
 **Important**: Use the `COPILOT_MCP_` prefix for all MCP-related variables.
 
-### 2. Create Environment Variables in Repository
+#### For Python-Based MCP Server Only:
+If you're using an agent that runs the Neo4j MCP Cypher Server directly as a Python command (not Docker), you also need:
 
-Also create the same environment variables at the repository level:
+- A GitHub Actions workflow to set up the Python environment
+- See [`.github/workflows/copilot-setup-steps.yml`](.github/workflows/copilot-setup-steps.yml) for the workflow configuration
 
-1. Go to Settings → Environments
-2. Create an environment named `copilot`
-3. Add all the same variables with their values
+This workflow ensures that Python and the required Neo4j MCP Cypher Server packages are available when Copilot agents execute.
 
-### 3. Configure Workflow Setup
-
-The Python-based agent requires a GitHub Actions workflow to set up the Python environment. This is critical for agents that run the Neo4j MCP Cypher Server directly.
-
-See [`.github/workflows/copilot-setup-steps.yml`](.github/workflows/copilot-setup-steps.yml) for the workflow configuration.
-
-This workflow ensures that the Python environment and required Neo4j MCP Cypher Server packages are available when Copilot agents execute.
+**Note**: The Docker-based agent does NOT require the workflow setup since the MCP server runs inside a container with its own environment.
 
 ## Testing Your Custom Agent
 
@@ -167,13 +179,16 @@ For a complete example of what the agent generates, see [PR #4](https://github.c
 
 ## Summary Checklist
 
-When setting up custom agents with MCP servers:
-
-- [ ] Create agents in organization-level `.github-private` repository
+### Part 1: Organization-Level Setup
+- [ ] Create `.github-private` repository in your organization
+- [ ] Create agent definition files in `.github-private/copilot/agents/`
 - [ ] Define MCP server configuration with proper `command`, `args`, and `env` mapping
-- [ ] Create `COPILOT_MCP_*` environment variables at organization level
-- [ ] Create matching environment variables in repository settings under `copilot` environment
-- [ ] Set up `.github/workflows/copilot-setup-steps.yml` for Python-based MCP servers
+- [ ] Specify tool permissions for each agent
+
+### Part 2: Repository-Level Setup
+- [ ] Create `copilot` environment in repository settings
+- [ ] Add `COPILOT_MCP_*` environment variables in the `copilot` environment
+- [ ] (Python MCP only) Set up `.github/workflows/copilot-setup-steps.yml` workflow
 - [ ] Test agent with simple queries before deploying complex workflows
 
 ## Additional Resources
