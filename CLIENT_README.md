@@ -28,6 +28,16 @@ pip install -e ".[dev]"
 
 ## Quick Start
 
+### Complete Example
+
+For a complete working example, see [examples/basic_usage.py](examples/basic_usage.py) which demonstrates:
+- Connecting to the database
+- Querying aircraft, airports, and flights
+- Finding maintenance events
+- Using multiple repositories
+
+See [examples/README.md](examples/README.md) for instructions on running the examples.
+
 ### Basic Usage
 
 ```python
