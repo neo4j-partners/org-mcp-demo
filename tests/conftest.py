@@ -13,8 +13,8 @@ def neo4j_container():
     Yields:
         Neo4jContainer instance with connection details
     """
-    with Neo4jContainer("neo4j:5.15") as container:
-        container.with_env("NEO4J_AUTH", "neo4j/testpassword")
+    # Create container with specified password using constructor parameter
+    with Neo4jContainer(image="neo4j:5.15", password="testpassword") as container:
         yield container
 
 
@@ -50,7 +50,10 @@ def connection(neo4j_connection_params):
     yield conn
     
     # Cleanup: clear database after each test
-    with conn.session() as session:
-        session.run("MATCH (n) DETACH DELETE n")
+    try:
+        with conn.session() as session:
+            session.run("MATCH (n) DETACH DELETE n")
+    except:
+        pass  # Ignore cleanup errors
     
     conn.close()

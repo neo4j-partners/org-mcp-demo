@@ -28,8 +28,8 @@ class Neo4jConnection:
         
         Args:
             uri: Neo4j connection URI (e.g., "bolt://localhost:7687")
-            username: Database username
-            password: Database password
+            username: Database username (empty string for no auth)
+            password: Database password (empty string for no auth)
             database: Target database name (default: "neo4j")
             
         Raises:
@@ -42,10 +42,14 @@ class Neo4jConnection:
         self._driver: Optional[Driver] = None
         
         try:
-            self._driver = GraphDatabase.driver(
-                self.uri,
-                auth=(self.username, self.password)
-            )
+            # If both username and password are empty, don't use auth
+            if not username and not password:
+                self._driver = GraphDatabase.driver(self.uri, auth=None)
+            else:
+                self._driver = GraphDatabase.driver(
+                    self.uri,
+                    auth=(self.username, self.password)
+                )
             # Verify connectivity
             self._driver.verify_connectivity()
         except Exception as e:
