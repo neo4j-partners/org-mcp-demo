@@ -14,8 +14,8 @@ def neo4j_container():
     Yields:
         Neo4jContainer instance
     """
+    # Use Neo4j with authentication
     container = Neo4jContainer("neo4j:5.14")
-    container.with_env("NEO4J_AUTH", "neo4j/testpassword")
     container.start()
     
     yield container
@@ -30,11 +30,12 @@ def neo4j_uri(neo4j_container):
 
 
 @pytest.fixture(scope="session")
-def neo4j_credentials():
+def neo4j_credentials(neo4j_container):
     """Get Neo4j credentials for testing."""
+    # testcontainers-neo4j uses these default credentials
     return {
         "username": "neo4j",
-        "password": "testpassword"
+        "password": "password"
     }
 
 
