@@ -13,6 +13,27 @@ Specifically, this showcases a custom agent that automatically generates high-qu
 
 This setup was created in the `neo4j-partners` organization where I had administrator privileges. **Organization administrator privileges are required** to create the `.github-private` repository and configure organization-level custom agents with MCP server integrations.
 
+## 🚀 Python Client for Aircraft Data
+
+This repository includes a working Python client library for querying aircraft data from Neo4j. See:
+
+- **[README_CLIENT.md](README_CLIENT.md)** - Complete client documentation and usage guide
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Architecture documentation with mermaid diagrams
+- **[examples/basic_usage.py](examples/basic_usage.py)** - Working example demonstrating the client
+
+The client provides type-safe access to:
+- Aircraft fleet data
+- Flight operations
+- Airport information
+- Maintenance events
+- Aircraft systems and components
+
+```bash
+# Quick start
+pip install -e .
+python3 examples/basic_usage.py
+```
+
 ## Testing MCP Servers Directly
 
 Before creating custom agents, it can be useful to first test the [Neo4j MCP Cypher Server](https://github.com/neo4j-contrib/mcp-neo4j) directly to ensure it's working correctly. This allows you to verify connectivity and functionality independently from the agent configuration.
