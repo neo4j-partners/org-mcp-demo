@@ -25,6 +25,28 @@ pip install -e ".[dev]"
 
 ## Quick Start
 
+### Running the Examples
+
+The `examples/` directory contains working examples that demonstrate the client library:
+
+```bash
+# Set environment variables
+export NEO4J_URI="bolt://localhost:7687"
+export NEO4J_USERNAME="neo4j"
+export NEO4J_PASSWORD="your-password"
+export NEO4J_DATABASE="neo4j"
+
+# Run the basic usage example
+python3 examples/basic_usage.py
+```
+
+The example script demonstrates:
+- Listing aircraft in the fleet
+- Finding flights for specific aircraft
+- Querying airports by IATA code
+- Finding critical maintenance events
+- Retrieving aircraft systems
+
 ### Basic Usage
 
 ```python
