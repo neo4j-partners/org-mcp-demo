@@ -27,6 +27,22 @@ pip install -e ".[dev]"
 
 ## Quick Start
 
+### Running the Example
+
+A comprehensive usage example is provided in `examples/usage_example.py`:
+
+```bash
+python examples/usage_example.py
+```
+
+This example demonstrates:
+- Querying aircraft and their properties
+- Finding flights for specific aircraft
+- Searching flights by route
+- Querying airports
+- Finding maintenance events
+- Creating new aircraft (with cleanup)
+
 ### Basic Usage
 
 ```python
