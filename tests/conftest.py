@@ -30,7 +30,7 @@ def neo4j_uri(neo4j_container):
 @pytest.fixture(scope="session")
 def neo4j_auth(neo4j_container):
     """Get Neo4j authentication credentials."""
-    return ("neo4j", neo4j_container.NEO4J_ADMIN_PASSWORD)
+    return ("neo4j", neo4j_container.password)
 
 
 @pytest.fixture
