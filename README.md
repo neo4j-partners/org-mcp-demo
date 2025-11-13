@@ -1,198 +1,296 @@
-# Custom GitHub Copilot Agents with Neo4j MCP Cypher Server
+# Neo4j Aircraft Data Client
 
-This repository demonstrates how to set up custom GitHub Copilot agents that integrate with the [Neo4j MCP Cypher Server](https://github.com/neo4j-contrib/mcp-neo4j).
+A Python client library for working with aircraft data in Neo4j. This library provides a clean, type-safe interface to query and manage aviation-related data including aircraft, flights, airports, maintenance events, and more.
 
-Specifically, this showcases a custom agent that automatically generates high-quality Python Neo4j client libraries with best practices including:
-- Pydantic models for type safety
-- Repository pattern for clean query organization
-- Parameterized Cypher queries to prevent injection attacks
-- Integration tests using testcontainers
-- Modern Python packaging with pyproject.toml
+## Features
 
-**Important**: This repository contains **example agent configurations and documentation only**. The actual custom agents are deployed in the organization-level `neo4j-partners/.github-private` repository, where they are available across all repositories in the organization.
+✅ **Type-safe models** - Pydantic models with full type hints  
+✅ **Repository pattern** - Clean separation of data access logic  
+✅ **Parameterized queries** - Protection against injection attacks  
+✅ **Connection management** - Context manager support for safe resource handling  
+✅ **Comprehensive testing** - Integration tests using testcontainers  
+✅ **Modern Python** - Built for Python 3.9+ with latest best practices  
 
-This setup was created in the `neo4j-partners` organization where I had administrator privileges. **Organization administrator privileges are required** to create the `.github-private` repository and configure organization-level custom agents with MCP server integrations.
+## Installation
 
-## Testing MCP Servers Directly
+### From Source
 
-Before creating custom agents, it can be useful to first test the [Neo4j MCP Cypher Server](https://github.com/neo4j-contrib/mcp-neo4j) directly to ensure it's working correctly. This allows you to verify connectivity and functionality independently from the agent configuration.
-
-See the [GitHub documentation on extending the coding agent with MCP](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/extend-coding-agent-with-mcp) for instructions on how to configure and test MCP servers locally.
-
-This repository includes two example configurations for the Neo4j MCP Cypher Server in [`sample-mcp-config/`](sample-mcp-config/):
-- [`neo4j-mcp-docker-config.json`](sample-mcp-config/neo4j-mcp-docker-config.json) - Docker-based MCP server configuration
-- [`neo4j-mcp-local-config.json`](sample-mcp-config/neo4j-mcp-local-config.json) - Local Python-based MCP server configuration
-
-## What are Custom GitHub Copilot Agents?
-
-Custom agents extend GitHub Copilot's capabilities by providing specialized tools and domain-specific knowledge. They can be configured to use external tools, APIs, and MCP servers to perform complex tasks beyond standard code completion.
-
-For more details on custom agents, see:
-- [GitHub Copilot Custom Agents Documentation](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-custom-agents)
-- [Awesome Copilot Agents Collection](https://github.com/github/awesome-copilot/tree/5cfe2e26159bcd4015ba4c8bdf18fff2a268049c/agents)
-
-## Critical: Organization-Level Setup for MCP Servers
-
-**IMPORTANT**: If your agent uses MCP servers, it MUST be created at the **organization level** in a **private `.github-private` repository**.
-
-Individual repository-level agents cannot access MCP servers and will not work. **This repository does not contain the actual agents** - they must be created in your organization's `.github-private` repository.
-
-See the official [GitHub documentation on creating custom agents](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-custom-agents) for detailed setup instructions.
-
-### Prerequisites
-
-1. **Create a `.github-private` repository** in your organization first. This is a special private repository that GitHub uses for organization-level configurations. See the [GitHub documentation on adding a member-only organization profile README](https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/customizing-your-organizations-profile#adding-a-member-only-organization-profile-readme) for instructions on creating this repository.
-
-2. **Organization administrator privileges** are required to create and configure the `.github-private` repository
-
-3. **Access to organization-level settings** for environment variables and secrets
-
-### Repository Structure
-
-Your organization should have a `.github-private` repository with the following structure:
-```
-<your-org>/.github-private/
-└── copilot/
-    └── agents/
-        ├── your-agent-1.md
-        └── your-agent-2.md
+```bash
+pip install -e .
 ```
 
-Organization and enterprise owners can create custom agents in a `.github-private` repository that are available across all repositories within their organization or enterprise.
+### With Development Dependencies
 
-## Example Agents
-
-This repository includes two example agents that demonstrate different approaches to running the [Neo4j MCP Cypher Server](https://github.com/neo4j-contrib/mcp-neo4j):
-
-### 1. Docker-Based Agent
-
-See [`org-setup-files/agents/neo4j-docker-client-generator.md`](org-setup-files/agents/neo4j-docker-client-generator.md)
-
-This agent runs the Neo4j MCP Cypher Server inside a Docker container.
-
-### 2. Python Direct Agent
-
-See [`org-setup-files/agents/neo4j-local-client-generator.md`](org-setup-files/agents/neo4j-local-client-generator.md)
-
-This agent runs the Neo4j MCP Cypher Server directly as a Python command.
-
-### Agent File Layout
-
-Each agent definition follows this structure:
-
-```yaml
----
-name: agent-name
-description: Brief description of what the agent does
-tools: ['read', 'edit', 'search', 'shell', 'mcp-server-name/*']
-mcp-servers:
-  server-name:
-    type: 'local'
-    command: 'command-to-run'
-    args: ['arg1', 'arg2']
-    env:
-      VAR_NAME: '${ENVIRONMENT_VARIABLE}'
-    tools: ["*"]
----
-
-# Agent Instructions
-
-Your agent's detailed instructions go here...
+```bash
+pip install -e ".[dev]"
 ```
 
-## Setup Overview
+## Quick Start
 
-Setting up custom agents with MCP servers involves two distinct parts:
+### Basic Usage
 
-### Part 1: Organization-Level Agent Configuration
+```python
+from neo4j_client import Neo4jConnection, AircraftRepository, FlightRepository
 
-This is where you define your custom agents and their MCP server integrations. This must be done in your organization's `.github-private` repository.
+# Create connection
+connection = Neo4jConnection(
+    uri="bolt://localhost:7687",
+    username="neo4j",
+    password="your-password",
+    database="neo4j"
+)
 
-**What goes here:**
-- Agent definition files (`.md` files in `copilot/agents/`)
-- MCP server configuration (command, args, env mappings)
-- Tool permissions for the agent
+# Use context manager for automatic cleanup
+with connection:
+    session = connection.get_session()
+    
+    # Create repository instances
+    aircraft_repo = AircraftRepository(session)
+    flight_repo = FlightRepository(session)
+    
+    # Find an aircraft
+    aircraft = aircraft_repo.find_by_tail_number("N12345")
+    if aircraft:
+        print(f"Found: {aircraft.model} operated by {aircraft.operator}")
+        
+        # Get flights for this aircraft
+        flights = flight_repo.find_by_aircraft(aircraft.aircraft_id, limit=10)
+        print(f"Recent flights: {len(flights)}")
+    
+    session.close()
+```
 
-**Example:** See the agent files in [`org-setup-files/agents/`](org-setup-files/agents/) for complete examples.
+### Creating New Aircraft
 
-### Part 2: Repository-Level Configuration
+```python
+from neo4j_client import Aircraft, AircraftRepository, Neo4jConnection
 
-This is where you configure each individual repository to work with your custom agents.
+aircraft = Aircraft(
+    aircraft_id="AC001",
+    tail_number="N54321",
+    icao24="A54321",
+    model="Boeing 737-800",
+    operator="Example Airlines",
+    manufacturer="Boeing"
+)
 
-**What's required:**
+with Neo4jConnection(uri, username, password) as connection:
+    session = connection.get_session()
+    repo = AircraftRepository(session)
+    
+    created = repo.create(aircraft)
+    print(f"Created aircraft: {created.aircraft_id}")
+    
+    session.close()
+```
 
-#### For All Agents:
-- Create environment variables in repository settings:
-  1. Go to Settings → Environments
-  2. Create an environment named `copilot`
-  3. Add your Neo4j connection variables:
-     - `COPILOT_MCP_NEO4J_URI`
-     - `COPILOT_MCP_NEO4J_USERNAME`
-     - `COPILOT_MCP_NEO4J_PASSWORD`
-     - `COPILOT_MCP_NEO4J_DATABASE`
+### Querying Flights by Route
 
-**Important**: Use the `COPILOT_MCP_` prefix for all MCP-related variables.
+```python
+from neo4j_client import FlightRepository, Neo4jConnection
 
-#### For Python-Based MCP Server Only:
-If you're using an agent that runs the Neo4j MCP Cypher Server directly as a Python command (not Docker), you also need:
+with Neo4jConnection(uri, username, password) as connection:
+    session = connection.get_session()
+    flight_repo = FlightRepository(session)
+    
+    # Find all flights from LAX to JFK
+    flights = flight_repo.find_by_route("LAX", "JFK", limit=50)
+    
+    for flight in flights:
+        print(f"{flight.flight_number}: {flight.scheduled_departure}")
+    
+    session.close()
+```
 
-- A GitHub Actions workflow to set up the Python environment
-- See [`.github/workflows/copilot-setup-steps.yml`](.github/workflows/copilot-setup-steps.yml) for the workflow configuration
+### Finding Maintenance Events
 
-This workflow ensures that Python and the required Neo4j MCP Cypher Server packages are available when Copilot agents execute.
+```python
+from neo4j_client import MaintenanceEventRepository, Neo4jConnection
 
-**Note**: The Docker-based agent does NOT require the workflow setup since the MCP server runs inside a container with its own environment.
+with Neo4jConnection(uri, username, password) as connection:
+    session = connection.get_session()
+    maintenance_repo = MaintenanceEventRepository(session)
+    
+    # Find critical maintenance events
+    critical_events = maintenance_repo.find_critical_events(limit=20)
+    
+    for event in critical_events:
+        print(f"Event {event.event_id}: {event.fault}")
+        print(f"  Severity: {event.severity}")
+        print(f"  Action: {event.corrective_action}")
+    
+    session.close()
+```
 
-## Testing Your Custom Agent
+## Available Models
 
-Once your agent is configured, follow these steps to test it:
+The library includes Pydantic models for all major entities:
 
-### 1. Create and Assign an Issue to Copilot
+- **Aircraft** - Commercial aircraft in the fleet
+- **Airport** - Airports with location data
+- **Flight** - Scheduled flight operations
+- **System** - Aircraft systems (hydraulics, avionics, etc.)
+- **Component** - System components
+- **Sensor** - Monitoring sensors
+- **Reading** - Time-series sensor readings
+- **MaintenanceEvent** - Maintenance events and fault reports
+- **Delay** - Flight delay incidents
 
-Create a new issue in your repository and assign it to Copilot.
+See the [DATA_MODEL.md](DATA_MODEL.md) for complete schema documentation.
 
-**Important**: You must click away from the assignment dropdown after assigning to Copilot, then return to set the custom agent. The custom agent selection will not be available until you click out first.
+## Available Repositories
 
-![Assigning custom agent to issue](images/custom-agent.png)
+### AircraftRepository
 
-### 2. Monitor Agent Startup
+```python
+# CRUD operations
+aircraft = repo.create(aircraft_model)
+aircraft = repo.find_by_id(aircraft_id)
+aircraft = repo.find_by_tail_number(tail_number)
+aircraft_list = repo.find_all(limit=100)
+aircraft_list = repo.find_by_operator(operator, limit=100)
+success = repo.delete(aircraft_id)
+```
 
-Give the agent a couple of minutes to start up. Once it begins, you'll see "Copilot started work on..." in the issue comments. Click on that link to see the status and logs.
+### FlightRepository
 
-![Finding custom agent logs](images/find-custom-agent-logs.png)
+```python
+# Query operations
+flight = repo.find_by_id(flight_id)
+flights = repo.find_by_aircraft(aircraft_id, limit=100)
+flights = repo.find_by_route(origin, destination, limit=100)
+flights = repo.find_with_delays(min_delay_minutes=30, limit=100)
+```
 
-### 3. Verify MCP Server Connection
+### SystemRepository
 
-Once started, you'll see the agent connect to Neo4j and retrieve the schema, confirming that the MCP server integration is working correctly.
+```python
+# Query operations
+system = repo.find_by_id(system_id)
+systems = repo.find_by_aircraft(aircraft_id)
+```
 
-![Custom agent logs showing Neo4j connection](images/custom-agent-logs.png)
+### MaintenanceEventRepository
 
-### 4. View Detailed Debug Logs
+```python
+# Query operations
+events = repo.find_by_aircraft(aircraft_id, limit=100)
+events = repo.find_by_severity(severity, limit=100)
+events = repo.find_critical_events(limit=100)
+```
 
-You can go to the Actions tab in your repository to see detailed debug logs for each agent run.
+### AirportRepository
 
-![Custom agent debug logs in Actions](images/custom-agent-debug-logs.png)
+```python
+# Query operations
+airport = repo.find_by_iata(iata_code)
+airport = repo.find_by_icao(icao_code)
+airports = repo.find_all(limit=100)
+```
 
-### Example Output
+## Testing
 
-For a complete example of what the agent generates, see [PR #4](https://github.com/neo4j-partners/org-mcp-demo/pull/4) which shows a full Python Neo4j client library generated by the custom agent, including models, repository patterns, tests, and documentation.
+This library uses pytest with testcontainers for integration testing.
 
-## Summary Checklist
+### Run All Tests
 
-### Part 1: Organization-Level Setup
-- [ ] Create `.github-private` repository in your organization
-- [ ] Create agent definition files in `.github-private/copilot/agents/`
-- [ ] Define MCP server configuration with proper `command`, `args`, and `env` mapping
-- [ ] Specify tool permissions for each agent
+```bash
+pytest
+```
 
-### Part 2: Repository-Level Setup
-- [ ] Create `copilot` environment in repository settings
-- [ ] Add `COPILOT_MCP_*` environment variables in the `copilot` environment
-- [ ] (Python MCP only) Set up `.github/workflows/copilot-setup-steps.yml` workflow
-- [ ] Test agent with simple queries before deploying complex workflows
+### Run with Coverage
 
-## Additional Resources
+```bash
+pytest --cov=neo4j_client --cov-report=html
+```
 
-- [MCP Protocol Documentation](https://modelcontextprotocol.io/)
-- [GitHub Copilot Extensions](https://github.com/features/copilot)
-- [Neo4j MCP Server](https://github.com/neo4j-contrib/mcp-neo4j)
+### Run Specific Test File
+
+```bash
+pytest tests/test_repository.py
+```
+
+## Architecture
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture documentation including diagrams.
+
+## Environment Variables
+
+For production use, configure connection using environment variables:
+
+```bash
+export NEO4J_URI="bolt://localhost:7687"
+export NEO4J_USERNAME="neo4j"
+export NEO4J_PASSWORD="your-password"
+export NEO4J_DATABASE="neo4j"
+```
+
+```python
+import os
+from neo4j_client import Neo4jConnection
+
+connection = Neo4jConnection(
+    uri=os.getenv("NEO4J_URI"),
+    username=os.getenv("NEO4J_USERNAME"),
+    password=os.getenv("NEO4J_PASSWORD"),
+    database=os.getenv("NEO4J_DATABASE", "neo4j")
+)
+```
+
+## Error Handling
+
+The library provides custom exceptions for better error handling:
+
+```python
+from neo4j_client import (
+    Neo4jClientError,      # Base exception
+    ConnectionError,       # Connection failures
+    QueryError,            # Query execution failures
+    NotFoundError,         # Entity not found
+)
+
+try:
+    aircraft = repo.find_by_id("AC001")
+except ConnectionError as e:
+    print(f"Failed to connect: {e}")
+except QueryError as e:
+    print(f"Query failed: {e}")
+except Neo4jClientError as e:
+    print(f"Client error: {e}")
+```
+
+## Security
+
+This library follows security best practices:
+
+- ✅ All queries use parameterization (no string interpolation)
+- ✅ Input validation using Pydantic models
+- ✅ No raw Cypher query construction from user input
+- ✅ Connection credentials never logged or exposed
+
+## Next Steps
+
+This is a starting point for working with aircraft data in Neo4j. You can extend it by:
+
+1. **Add more repository methods** - Custom queries for your specific use cases
+2. **Implement write operations** - Update methods for flights, systems, etc.
+3. **Add relationship management** - Methods to create/manage relationships
+4. **Enhance error handling** - More granular exception types
+5. **Add async support** - For high-performance applications
+6. **Implement caching** - For frequently accessed data
+7. **Add monitoring** - Logging and metrics collection
+
+## Contributing
+
+Contributions are welcome! This library is designed to be simple and extensible.
+
+## License
+
+MIT License
+
+## Related Documentation
+
+- [Neo4j Python Driver Documentation](https://neo4j.com/docs/python-manual/current/)
+- [Pydantic Documentation](https://docs.pydantic.dev/)
+- [Aircraft Data Model](DATA_MODEL.md)
+- [Architecture Documentation](ARCHITECTURE.md)
