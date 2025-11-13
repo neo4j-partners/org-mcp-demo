@@ -46,7 +46,7 @@ def neo4j_connection(neo4j_container):
     connection = Neo4jConnection(
         uri=neo4j_container.get_connection_url(),
         username="neo4j",
-        password="test12345",
+        password=neo4j_container.password,
         database="neo4j"
     )
     connection.connect()
