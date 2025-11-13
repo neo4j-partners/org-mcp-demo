@@ -28,8 +28,8 @@ def neo4j_connection(neo4j_container):
         Neo4jConnection: Connected Neo4j client
     """
     uri = neo4j_container.get_connection_url()
-    username = "neo4j"
-    password = "test"
+    username = neo4j_container.username
+    password = neo4j_container.password
     
     with Neo4jConnection(uri, username, password) as conn:
         yield conn
