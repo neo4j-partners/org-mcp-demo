@@ -27,8 +27,8 @@ def neo4j_connection(neo4j_container):
     This fixture creates a connection to the test Neo4j container.
     """
     uri = neo4j_container.get_connection_url()
-    username = "neo4j"
-    password = "test"
+    username = neo4j_container.username
+    password = neo4j_container.password
     
     conn = Neo4jConnection(uri, username, password)
     
