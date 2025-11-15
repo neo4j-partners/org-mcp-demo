@@ -12,7 +12,7 @@ def neo4j_container():
     Yields:
         Neo4jContainer instance with Neo4j running
     """
-    with Neo4jContainer("neo4j:5.13") as container:
+    with Neo4jContainer("neo4j:5.13", password="testpassword") as container:
         yield container
 
 
